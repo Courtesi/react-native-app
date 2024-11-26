@@ -1,55 +1,42 @@
-import { RefreshControl, Image, View, Text, SafeAreaView, FlatList, Alert } from 'react-native'
+import { RefreshControl, Image, View, Text, SafeAreaView, FlatList } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import {images} from '@/constants';
 import SearchInput from '@/components/SearchInput';
 import Trending from '@/components/Trending';
 import EmptyState from '@/components/EmptyState';
-import { getAllPosts } from '@/lib/appwrite';
+import { getAllPosts, getLatestPosts } from '@/lib/appwrite';
+import useAppwrite from '@/lib/useAppwrite';
+import VideoCard from '@/components/VideoCard';
 import { Models } from 'react-native-appwrite';
 
+
 const Home = () => {
-    const [data, setData] = useState<Array<Models.Document>>([]);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            try {
-                const response = await getAllPosts();
-
-                setData(response);
-            } catch(error) {
-                if (error instanceof Error) {
-                    Alert.alert('Error', error.message);
-                } else {
-                    Alert.alert('Error: an unknown error occurred');
-                }
-            } finally {
-                setIsLoading(false);
-            }
-        }
-    })
-
-    console.log(data);
+    const {data: posts, refetch} = useAppwrite(getAllPosts);
+    const {data: latestPosts} = useAppwrite(getLatestPosts);
 
     const [refreshing, setRefreshing] = useState(false);
 
     const onRefresh = async () => {
         setRefreshing(true);
         //re call videos -> if any new videos appeared
+        await refetch();
         setRefreshing(false);
     }
+
+    // console.log(posts);
 
     return (
     <SafeAreaView className = "bg-primary border-2 \
     h-full">
         <FlatList
-            data = {[{id: 1}, {id: 2}, {id: 3}]}
+            data = {posts}
             // data = {[]}
-            keyExtractor={(item:any) => item.$id}
+            keyExtractor={(item:Models.Document) => item.$id}
             renderItem = {({item}) => (
-                <Text className = "text-3xl text-white">{item.id}</Text>
+                <VideoCard
+                video = {item}
+                />
             )}
             ListHeaderComponent = {() => (
                 <View className = "my-6 px-4 space-y-6">
@@ -80,7 +67,7 @@ const Home = () => {
                         </Text>
 
                         <Trending
-                        posts = {[{id: 1}, {id: 2}, {id: 3}]}
+                        posts = {latestPosts ?? []}
                         />
                         
                     </View>
