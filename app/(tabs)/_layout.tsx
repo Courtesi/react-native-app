@@ -1,25 +1,25 @@
 import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
 
-import { TabBarIcon } from '@/components/navigation/TabBarIcon';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Text, View, Image, StatusBar } from 'react-native';
 
 import {icons} from '../../constants';
 import { useGlobalContext } from "../../context/GlobalProvider";
-import Loader from "@/components/Loader";
+// import Loader from "@/components/Loader";
 
 const TabIcon = ({icon, color, name, focused}: {icon: any, color: string, name: string, focused: boolean}) => {
     return (
-        <View className = "items-center justify-center gap-2">
+        <View className = "w-16 flex items-center justify-center gap-">
             <Image
                 source = {icon}
                 resizeMode = "contain"
                 tintColor={color}
                 className="w-6 h-6"
             />
-            <Text className={`${focused} ? 'font-psemibold' : 'font-pregular'} text-xs`} style = {{color: color}}>
+            <Text className={`${focused ? "font-psemibold" : "font-pregular"} text-xs`}
+            style = {{color: color}}>
                 {name}
             </Text>
         </View>
@@ -38,10 +38,10 @@ export default function TabLayout() {
             tabBarInactiveTintColor: "#CDCDE0",
             tabBarShowLabel: false,
             tabBarStyle: {
-            backgroundColor: "#161622",
-            borderTopWidth: 1,
-            borderTopColor: "#232533",
-            height: 84,
+                backgroundColor: "#161622",
+                borderTopWidth: 1,
+                borderTopColor: "#232533",
+                height: 84,
             },
         }}>
             <Tabs.Screen

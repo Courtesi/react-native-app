@@ -29,6 +29,9 @@ const SignIn = () => {
 
             // set it to global state...
             const result = await getCurrentUser();
+            if (!result) {
+                throw Error("User is undefined for some reason?");
+            }
             setUser(result);
             setIsLogged(true);
             router.replace('/home');

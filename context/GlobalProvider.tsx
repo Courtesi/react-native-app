@@ -7,8 +7,8 @@ import { Models } from "react-native-appwrite";
 interface GlobalStateInterface {
 	isLogged: boolean;
 	setIsLogged: Dispatch<SetStateAction<boolean>>;
-	user: Models.Document | null | undefined;
-	setUser: Dispatch<SetStateAction<Models.Document | null | undefined>>;
+	user: Models.Document | null;
+	setUser: Dispatch<SetStateAction<Models.Document | null>>;
 	loading: boolean;
 }
 
@@ -25,7 +25,7 @@ export const useGlobalContext = () => useContext(GlobalContext);
 
 const GlobalProvider = ({ children }: any) => {
 	const [isLogged, setIsLogged] = useState(false);
-	const [user, setUser] = useState<Models.Document | null | undefined>(null);
+	const [user, setUser] = useState<Models.Document | null>(null);
 	const [loading, setLoading] = useState<boolean>(true);
 
 	useEffect(() => {

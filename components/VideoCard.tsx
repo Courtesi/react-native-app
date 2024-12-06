@@ -33,7 +33,7 @@ const VideoCard = ({video}: {video: Models.Document}) => {
                 <View className = "w-[46px] h-[46px] \
                 rounded-lg border border-secondary \
                 justify-center items-center p-0.5">
-                    <Image source = {{uri: users.avatar}}
+                    <Image source = {{uri: users?.avatar}}
                     className = "w-full h-full rounded-lg"
                     resizeMode = "cover"/>
                 </View>
@@ -45,7 +45,7 @@ const VideoCard = ({video}: {video: Models.Document}) => {
                     </Text>
                     <Text className="text-xs text-gray-100\
                     font-pregular" numberOfLines={1}>
-                        {users.username}
+                        {users?.username}
                     </Text>
                 </View>
             </View>

@@ -122,7 +122,7 @@ export const getLatestPosts = async () => {
         const posts = await databases.listDocuments(
             databaseId,
             videoCollectionId,
-            [Query.orderDesc('$createdAt'), Query.limit(7)]
+            [Query.orderDesc("$createdAt"), Query.limit(7)]
         )
 
         // console.log(posts);
@@ -130,5 +130,51 @@ export const getLatestPosts = async () => {
         return posts.documents;
     } catch (error) {
         throw error;
+    }
+}
+
+export const searchPosts = async (query: string) => {
+    try {
+        const posts = await databases.listDocuments(
+            databaseId,
+            videoCollectionId,
+            [Query.search("title", query)]
+        )
+
+        if (!posts) throw new Error("Something went wrong");
+
+        console.log(query, posts);
+
+        return posts.documents;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const getUserPosts = async (userId: string) => {
+    try {
+        const posts = await databases.listDocuments(
+            databaseId,
+            videoCollectionId,
+            [Query.equal("creator", userId)]
+        )
+
+        if (!posts) throw new Error("Something went wrong");
+
+        // console.log(query, posts);
+
+        return posts.documents;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const signOut = async () => {
+    try {
+        const session = await account.deleteSession('current');
+
+        return session;
+    } catch (Error) {
+        throw Error;
     }
 }
