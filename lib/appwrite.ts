@@ -1,4 +1,6 @@
-import { Account, Avatars, Client, Databases, ID, Query } from 'react-native-appwrite';
+import { Form } from '@/app/(tabs)/create';
+import { Storage, Account, Avatars, Client, Databases, ID, Query, ImageGravity } from 'react-native-appwrite';
+import * as ImagePicker from 'expo-image-picker';
 
 export const config = {
     // Your configuration here
@@ -33,6 +35,7 @@ client
 const account = new Account(client);
 const avatars = new Avatars(client);
 const databases = new Databases(client);
+const storage = new Storage(client);
 
 export const createUser = async (email: string, username: string, password: string) => {
     try {
@@ -108,7 +111,8 @@ export const getAllPosts = async () => {
     try {
         const posts = await databases.listDocuments(
             databaseId,
-            videoCollectionId
+            videoCollectionId,
+            [Query.orderDesc('$createdAt')]
         )
 
         return posts.documents;
@@ -176,5 +180,77 @@ export const signOut = async () => {
         return session;
     } catch (Error) {
         throw Error;
+    }
+}
+
+export const getFilePreview = async(fileId: string, type: any) => {
+    let fileUrl;
+
+    try {
+        if (type === "video") {
+            fileUrl = storage.getFileView(storageId, fileId);
+        } else if (type === "image") {
+            fileUrl = storage.getFilePreview(storageId, fileId, 2000, 2000, ImageGravity.Top, 100)
+        } else {
+            throw Error("Invalid file type");
+        }
+
+        if (!fileUrl) throw Error("No fileURL");
+
+        return fileUrl;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const uploadFile = async (file: ImagePicker.ImagePickerAsset | null, type: string) => {
+    if (!file) return;
+
+    const asset = {
+        name: String(file.fileName),
+        type: String(file.mimeType),
+        size: Number(file.fileSize),
+        uri: file.uri
+    };
+
+    try {
+        const uploadedFile = await storage.createFile(
+            storageId,
+            String(ID.unique()),
+            asset
+        );
+
+        const fileUrl = await getFilePreview(uploadedFile.$id, type);
+
+        console.log(uploadedFile);
+        return fileUrl;
+
+    } catch (error: any) {
+        throw error;
+    }
+}
+export const createVideo = async (form: Form) => {
+    try {
+        const [thumbnailUrl, videoUrl] = await Promise.all([
+            uploadFile(form.thumbnail, "image"),
+            uploadFile(form.video, "video"),
+        ]);
+
+        // console.log("Testing");
+
+        const newPost = await databases.createDocument(
+            databaseId, videoCollectionId, ID.unique(), 
+            {
+                title: form.title,
+                thumbnail: thumbnailUrl,
+                video: videoUrl,
+                prompt: form.prompt,
+                creator: form.userId
+            }
+        )
+
+        return newPost;
+    } catch (error: any) {
+        throw error;
     }
 }
